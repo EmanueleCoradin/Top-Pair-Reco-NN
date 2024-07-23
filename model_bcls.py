@@ -68,7 +68,7 @@ def make_model(input_shapes, input_titles, num_layers_per_input, num_layers, num
     model = TitledModel(inputs=inputs, outputs=[cls], input_titles=input_titles, output_titles=output_titles)
     model.compile(
         loss=loss,
-        optimizer=keras.optimizers.Adam(learning_rate=lr, decay=decay),
+        optimizer=tf.keras.optimizers.legacy.Adam(learning_rate=lr, decay=decay),
         metrics=[],
         weighted_metrics=[accuracy_max]
     )
@@ -94,7 +94,19 @@ if __name__ == "__main__":
     features2 = feat("alep") + feat("lep") + ["met_pt", "met_phi", "met_x", "met_y"]
     train = load_data(args.traindata, features1, features2)
     validate = load_data(args.validatedata, features1, features2)
-    model = make_model([t.shape for t in train[0]], [features1, features2], [2, 0], 2, 200, "relu", 0.25, train[1].shape[1], [], 0.0003, 0)
+    model = make_model(
+        [t.shape for t in train[0]],  # Input shapes
+        [features1, features2],       # Input titles
+        [2, 0],                       # Number of layers per input
+        2,                            # Number of layers after concatenation
+        200,                          # Number of nodes per layer
+        "relu",                       # Activation function
+        0.25,                         # Dropout rate
+        train[1].shape[1],            # Number of outputs
+        [],                           # Output titles
+        0.0003,                       # Learning rate
+        0                             # Learning rate decay
+    )
     print(f"Got {train[0][0].shape[0]} events, {train[0][0].shape[1]} jets and {train[1].shape[1]} outputs")
     earlystop = keras.callbacks.EarlyStopping(patience=10, monitor="val_loss", mode="min")
     checkpoint = keras.callbacks.ModelCheckpoint("model_bcls.hdf5", save_best_only=True, verbose=1)

@@ -19,7 +19,7 @@ def load_data(path, inputs, targets):
     data["weight"] = data["weight"] * scale["weight"] + offset["weight"]
 
     weight = abs(np.asarray(data["weight"]))
-    data_x = [table_to_numpy(data[input]) for input in inputs]
+    data_x = [table_to_numpy(data, input) for input in inputs]
     if isinstance(targets[0], list):
         data_y = []
         for target in targets:
