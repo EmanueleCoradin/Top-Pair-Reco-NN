@@ -109,6 +109,8 @@ if __name__ == "__main__":
     )
     print(f"Got {train[0][0].shape[0]} events, {train[0][0].shape[1]} jets and {train[1].shape[1]} outputs")
     earlystop = keras.callbacks.EarlyStopping(patience=10, monitor="val_loss", mode="min")
+    with open("model_bcls_architecture.json", "w") as json_file:
+        json_file.write(model.to_json())
     checkpoint = keras.callbacks.ModelCheckpoint("model_bcls.hdf5", save_best_only=True, verbose=1)
 
     epochs = 500

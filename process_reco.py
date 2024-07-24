@@ -10,6 +10,7 @@ import pepper
 
 
 class Processor(pepper.ProcessorTTbarLL):
+    # Configures which data columns to save
     def __init__(self, config, outdir):
         config["columns_to_save"] = [
             ["genlepton", ["pt", "eta", "phi", "mass"]],
@@ -30,6 +31,7 @@ class Processor(pepper.ProcessorTTbarLL):
         ]
         super().__init__(config, outdir)
 
+    # Defines the sequence of data selection and transformation steps
     def process_selection(self, selector, dsname, is_mc, filler):
         era = self.get_era(selector.data, is_mc)
         if is_mc and "pileup_reweighting" in self.config:

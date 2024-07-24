@@ -7,9 +7,10 @@ import matplotlib.pyplot as plt
 import tensorflow as tf
 from tensorflow import keras
 from argparse import ArgumentParser
+from keras.models import model_from_json
 
-from general import table_to_numpy, TitledModel, plot_loss_history, custom_objects, HDF5File, MaxPassLayer, feat, load_normalization
-
+from general import table_to_numpy, TitledModel, plot_loss_history, HDF5File, MaxPassLayer, feat, load_normalization
+#custom_objects
 
 def load_data(path, inputs, targets):
     with HDF5File(path, "r") as f:
@@ -78,7 +79,7 @@ def make_model(input_shapes, input_titles, prev_models, num_layers_per_input, nu
     model = TitledModel(input_titles, output_titles, inputs=inputs, outputs=reg)
     model.compile(
         loss=loss,
-        optimizer=keras.optimizers.Adam(learning_rate=lr, decay=decay),
+        optimizer=tf.keras.optimizers.legacy.Adam(learning_rate=lr, decay=decay),
         metrics=[],
         weighted_metrics=[])
 
@@ -92,10 +93,14 @@ if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("traindata")
     parser.add_argument("validatedata")
-    parser.add_argument("-b", "--modelb", default="model_bcls.hdf5")
+    parser.add_argument("-bw", "--modelb_weights", default="model_bcls.hdf5")
+    parser.add_argument("-ba", "--modelb_arch", default="model_bcls_architecture.json")
     args = parser.parse_args()
 
-    model_b = keras.models.load_model(args.modelb, custom_objects=custom_objects)
+    with open(args.modelb_arch, 'r') as json_file:
+       model_bcls_json = json_file.read()
+    model_b = model_from_json(model_bcls_json)
+    model_b = keras.models.load_weights(args.modelb_weights)
 
     b_out = MaxPassLayer(2)([model_b.output, model_b.inputs[0]])
     model_bbar = TitledModel(
