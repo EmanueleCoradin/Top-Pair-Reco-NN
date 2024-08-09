@@ -29,6 +29,15 @@ class CompressionWrapper:
                                        compression_opts=self.compression_opts)
         self.group[name] = ds
 
+def nan_mean(column):
+    flattened_column = ak.flatten(column, axis=None)
+    non_nan_column = flattened_column[~np.isnan(flattened_column)]
+    return np.mean(non_nan_column)
+
+def nan_std(column):
+    flattened_column = ak.flatten(column, axis=None)
+    non_nan_column = flattened_column[~np.isnan(flattened_column)]
+    return np.std(non_nan_column)
 
 @ak.mixin_class(ak.behavior)
 class Dataframe:
@@ -57,6 +66,11 @@ class Dataframe:
     def std(self, *args, **kwargs):
         return self._runak(ak.std, *args, **kwargs)
 
+    def nanmean(self, *args, **kwargs):
+        return self._runak(nan_mean, *args, **kwargs)
+
+    def nanstd(self, *args, **kwargs):
+        return self._runak(nan_std, *args, **kwargs)
 
 class HDF5File(MutableMapping):
     def __init__(self, file, mode=None, compression=hdf5plugin.Blosc(),
@@ -184,13 +198,27 @@ def feat(particle, coord="both"):
     elif coord == "pt":
         return [f"{particle}_{x}" for x in
                 ["pt", "phi", "eta", "mass"]]
-
+    elif coord == "cart":
+        return [f"{particle}_{x}" for x in
+                ["t", "x", "y", "z"]]
 
 def table_to_numpy(table, fields):
     cols = []
     # Not using ak.fields here to enforce a specific order
     for field in fields:
         col = table[field]
+        if col.ndim == 2:
+            col = ak.pad_none(col, ak.max(ak.num(col)))
+        col = ak.fill_none(col, 0.)
+        cols.append(np.asarray(col))
+    return np.stack(cols, axis=-1)
+
+def table_to_numpy_visualization(table, fields):
+    cols = []
+    # Not using ak.fields here to enforce a specific order
+    for field in fields:
+        col = table[field]
+        col = ak.fill_none(col, np.nan)
         if col.ndim == 2:
             col = ak.pad_none(col, ak.max(ak.num(col)))
         col = ak.fill_none(col, 0.)

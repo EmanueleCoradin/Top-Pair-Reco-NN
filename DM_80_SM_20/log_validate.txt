@@ -1,0 +1,9 @@
+Traceback (most recent call last):
+  File "/gpfs/dust/cms/user/coradine/Top-Pair-Reco-NN/plot_validation.py", line 16, in <module>
+    import mplhep as hep
+  File "/home/coradine/.conda/envs/mambaDM/lib/python3.9/site-packages/mplhep/__init__.py", line 10, in <module>
+    from . import alice, atlas, cms, label, lhcb, plot
+  File "/home/coradine/.conda/envs/mambaDM/lib/python3.9/site-packages/mplhep/alice.py", line 5, in <module>
+    from matplotlib import docstring
+ImportError: cannot import name 'docstring' from 'matplotlib' (/home/coradine/.conda/envs/mambaDM/lib/python3.9/site-packages/matplotlib/__init__.py)
+ 1/24 [>.............................] - ETA: 8s 3/24 [==>...........................] - ETA: 0s 6/24 [======>.......................] - ETA: 0s 9/24 [==========>...................] - ETA: 0s12/24 [==============>...............] - ETA: 0s15/24 [=================>............] - ETA: 0s18/24 [=====================>........] - ETA: 0s21/24 [=========================>....] - ETA: 0s24/24 [==============================] - ETA: 0s24/24 [==============================] - 1s 22ms/step

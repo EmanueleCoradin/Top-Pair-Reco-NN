@@ -14,7 +14,8 @@ import mplhep as hep
 from argparse import ArgumentParser
 
 from general import custom_objects, table_to_numpy, HDF5File, feat, load_normalization
-
+from model_bcls import make_model as make_model_b
+from model_bcls import load_data as load_data_b
 
 def load_data(path, input_titles, validate_titles, norm):
     with HDF5File(path, "r") as f:
@@ -53,7 +54,7 @@ def plot_correctness(observable, bins, range, pred_true, mlb_true, found_mlb_jet
     plt.legend()
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
-    hep.cms.label(llabel="Private work (CMS simulation)", exp="", rlabel="", loc=0, fontsize=13)
+    hep.cms.label(llabel="Private work (CMS simulation)", rlabel="", loc=0, fontsize=13)
     plt.gcf().set_size_inches(plt.gcf().get_size_inches() / 1.3)
     plt.tight_layout()
     plt.savefig(os.path.join(args.output, "bcls_" + histname + ".svg"))
@@ -71,7 +72,7 @@ parser = ArgumentParser()
 parser.add_argument("traindata")
 parser.add_argument("validatedata")
 parser.add_argument("--model_bcls", default="model_bcls.hdf5")
-parser.add_argument("-o", "--output")
+parser.add_argument("--output", default='./', help="Output directory")
 args = parser.parse_args()
 if args.output is None:
     args.output = os.path.basename(os.path.dirname(args.validatedata))
@@ -79,7 +80,31 @@ if args.output is None:
 norm = load_normalization(args.traindata)
 os.makedirs(args.output, exist_ok=True)
 
-model = keras.models.load_model(args.model_bcls, custom_objects=custom_objects)
+# TODO: find a more elegant way to load the model
+#Reconstruct the model_b as has been done in the model_bcls file
+
+# Provided model construction details
+features1 = feat("jet") + ["jet_btag"]
+features2 = feat("alep") + feat("lep") + ["met_pt", "met_phi", "met_x", "met_y"]
+train    = load_data_b(args.traindata, features1, features2)
+validate = load_data_b(args.validatedata, features1, features2)
+
+model = make_model_b(
+    [t.shape for t in train[0]],  # Input shapes
+    [features1, features2],       # Input titles
+    [2, 0],                       # Number of layers per input
+    2,                            # Number of layers after concatenation
+    200,                          # Number of nodes per layer
+    "relu",                       # Activation function
+    0.25,                         # Dropout rate
+    train[1].shape[1],            # Number of outputs
+    [],                           # Output titles
+    0.0003,                       # Learning rate
+    0                             # Learning rate decay
+)
+
+model.load_weights(args.model_bcls)
+
 data_x, label, weight, validate = load_data(
     args.validatedata, model.input_titles,
     ["met_pt", "bot_pt", "abot_pt", "jet_pt"] + feat("lep", "pt") + feat("alep", "pt"),

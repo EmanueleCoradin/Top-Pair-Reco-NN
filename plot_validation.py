@@ -15,8 +15,13 @@ from matplotlib.colors import to_rgb
 from argparse import ArgumentParser
 import mplhep as hep
 import vector
+import hist
+from hist import Hist
 
-from general import custom_objects, feat, table_to_numpy, load_normalization, SwitchLayer, HDF5File
+from general import custom_objects, feat, table_to_numpy, load_normalization, SwitchLayer, HDF5File, MaxPassLayer, TitledModel
+from model_bcls import make_model as make_model_b
+from model_bcls import load_data as load_data_b
+from model_tt import make_model, load_data as load_data_tt
 
 particle_labels = {
     "bot": r"Bottom quark",
@@ -128,14 +133,14 @@ def plot_observable(observable, norm, pred, truth, weight, bins=50, range=None, 
             weights=weight,
             range=range,
             bins=50,
-            label=f"Analytic (MSE: {sonnen_mse:.3})",
+            label=f"Analytic Sonnenschein (MSE: {sonnen_mse:.3})",
             facecolor=to_rgb("C2") + (0.5,),
             edgecolor="C2")
     plt.xlabel(get_label(observable))
     plt.ylabel("Events / bin")
     plt.margins(x=0)
     plt.legend()
-    hep.cms.label(llabel="Private work (CMS simulation)", exp="", rlabel="", loc=0, fontsize=13)
+    hep.cms.label(llabel="Private work (CMS simulation)", rlabel="", loc=0, fontsize=13)
     plt.tight_layout()
     plt.savefig(os.path.join(args.output, f"predtruth_{observable}.svg"))
     plt.close()
@@ -202,7 +207,7 @@ def plot_resbias(observable, norm, pred, truth, bins=50, range=None, sonnen=None
         scale = norm[1][observable]
         if scale < 1e-10:
             return
-        range = (offset - 1.5 * scale, offset + 1.5 * scale)
+        range = (offset - 1. * scale, offset + 1. * scale)
     if relative is None:
         relative = not (range[0] <= 0 and 0 <= range[1])
     edges = np.linspace(range[0], range[1], bins)
@@ -233,7 +238,7 @@ def plot_resbias(observable, norm, pred, truth, bins=50, range=None, sonnen=None
     line = plt.step(edges, np.r_[resp[0], resp], label="Network")[0]
     plt.fill_between(edges, np.r_[resp_down[0], resp_down], np.r_[resp_up[0], resp_up], step="pre", color=line.get_color(), alpha=0.5)
     if sonnen is not None:
-        line = plt.step(edges, np.r_[resp_son[0], resp_son], label="Analytic")[0]
+        line = plt.step(edges, np.r_[resp_son[0], resp_son], label="Analytic Sonnenschein")[0]
         plt.fill_between(edges, np.r_[resp_down_son[0], resp_down_son], np.r_[resp_up_son[0], resp_up_son], step="pre", color=line.get_color(), alpha=0.5)
         plt.legend()
     plt.xlabel(f"True {xlabel}")
@@ -243,7 +248,7 @@ def plot_resbias(observable, norm, pred, truth, bins=50, range=None, sonnen=None
         plt.ylabel("Response")
     plt.grid()
     plt.margins(x=0)
-    hep.cms.label(llabel="Private work (CMS simulation)", exp="", rlabel="", loc=0, fontsize=13)
+    hep.cms.label(llabel="Private work (CMS simulation)", rlabel="", loc=0, fontsize=13)
     plt.tight_layout()
     plt.savefig(os.path.join(args.output, f"response_{observable}.svg"))
     plt.close()
@@ -253,7 +258,7 @@ def plot_resbias(observable, norm, pred, truth, bins=50, range=None, sonnen=None
     plt.fill_between(edges, np.r_[bias_down[0], bias_down], np.r_[bias_up[0], bias_up], step="pre", color=line.get_color(), alpha=0.5)
     if sonnen is not None:
         overall = np.mean(np.mean(abs(err_son)))
-        line = plt.step(edges, np.r_[bias_son[0], bias_son], label=f"Analytic (mean abs {overall:.3})")[0]
+        line = plt.step(edges, np.r_[bias_son[0], bias_son], label=f"Analytic Sonnenschein (mean abs {overall:.3})")[0]
         plt.fill_between(edges, np.r_[bias_down_son[0], bias_down_son], np.r_[bias_up_son[0], bias_up_son], step="pre", color=line.get_color(), alpha=0.5)
         plt.legend()
     if plt.ylim()[0] < -2:
@@ -267,7 +272,7 @@ def plot_resbias(observable, norm, pred, truth, bins=50, range=None, sonnen=None
         plt.ylabel("Bias")
     plt.grid()
     plt.margins(x=0)
-    hep.cms.label(llabel="Private work (CMS simulation)", exp="", rlabel="", loc=0, fontsize=13)
+    hep.cms.label(llabel="Private work (CMS simulation)", rlabel="", loc=0, fontsize=13)
     plt.tight_layout()
     plt.savefig(os.path.join(args.output, f"bias_{observable}.svg"))
     plt.close()
@@ -276,7 +281,7 @@ def plot_resbias(observable, norm, pred, truth, bins=50, range=None, sonnen=None
     plt.step(edges, np.r_[resolution[0], resolution], label=f"Network (mean {overall:.3})")
     if sonnen is not None:
         overall = np.sqrt(np.mean(err_son ** 2))
-        plt.step(edges, np.r_[resolution_son[0], resolution_son], label=f"Analytic (mean {overall:.3})")
+        plt.step(edges, np.r_[resolution_son[0], resolution_son], label=f"Analytic Sonnenschein (mean {overall:.3})")
         plt.legend()
     plt.ylim(0, plt.ylim()[1])
     if plt.ylim()[1] > 2:
@@ -288,7 +293,7 @@ def plot_resbias(observable, norm, pred, truth, bins=50, range=None, sonnen=None
         plt.ylabel("Standard deviation")
     plt.grid()
     plt.margins(x=0)
-    hep.cms.label(llabel="Private work (CMS simulation)", exp="", rlabel="", loc=0, fontsize=13)
+    hep.cms.label(llabel="Private work (CMS simulation)", rlabel="", loc=0, fontsize=13)
     plt.tight_layout()
     plt.savefig(os.path.join(args.output, f"resolution_{observable}.svg"))
     plt.close()
@@ -360,6 +365,9 @@ def get_partidx(model, particle):
     titles = model.output_titles
     return [title[0].split("_")[0] for title in titles].index(particle)
 
+#-------------------------------------------------------------------------------
+# ------------------------------------ MAIN ------------------------------------  
+#-------------------------------------------------------------------------------
 
 for gpu in tf.config.list_physical_devices("GPU"):
     tf.config.experimental.set_memory_growth(gpu, True)
@@ -367,15 +375,62 @@ for gpu in tf.config.list_physical_devices("GPU"):
 parser = ArgumentParser()
 parser.add_argument("traindata")
 parser.add_argument("validatedata")
+parser.add_argument("-b", "--modelb", default="model_bcls.hdf5")
 parser.add_argument("--model_tt", default="model_tt.hdf5")
-parser.add_argument("-o", "--output")
+parser.add_argument("--output", default='./', help="Output directory")
 args = parser.parse_args()
 if args.output is None:
     args.output = os.path.basename(os.path.dirname(args.validatedata))
 
 norm = load_normalization(args.traindata)
 validnorm = load_normalization(args.validatedata)
-model = keras.models.load_model(args.model_tt, custom_objects=custom_objects)
+
+# TODO: find a more elegant way to load the model_b
+
+#Reconstruct the model_b as has been done in the model_bcls file
+
+# Provided model construction details
+features1 = feat("jet") + ["jet_btag"]
+features2 = feat("alep") + feat("lep") + ["met_pt", "met_phi", "met_x", "met_y"]
+train    = load_data_b(args.traindata, features1, features2)
+validate = load_data_b(args.validatedata, features1, features2)
+
+model_b = make_model_b(
+    [t.shape for t in train[0]],  # Input shapes
+    [features1, features2],       # Input titles
+    [2, 0],                       # Number of layers per input
+    2,                            # Number of layers after concatenation
+    200,                          # Number of nodes per layer
+    "relu",                       # Activation function
+    0.25,                         # Dropout rate
+    train[1].shape[1],            # Number of outputs
+    [],                           # Output titles
+    0.0003,                       # Learning rate
+    0                             # Learning rate decay
+)
+
+model_b.load_weights(args.modelb)
+
+# Add the MaxPassLayer and continue growing the tt model
+b_out = MaxPassLayer(2)([model_b.output, model_b.inputs[0]])
+model_bbar = TitledModel(
+    model_b.input_titles,
+    [p + t.split("_")[1] for t in model_b.input_titles[0] for p in ("bot_", "abot_")],
+    inputs=model_b.inputs, outputs=[b_out])
+model_bbar.trainable = False
+
+inputs = model_b.input_titles + [["met_pt", "met_phi", "met_x", "met_y"] + feat("lep") + feat("alep")]
+targets = [
+    ["top_x", "top_y", "top_z", "top_mass"],
+    ["atop_x", "atop_y", "atop_z", "atop_mass"],
+]
+
+train = load_data_tt(args.traindata, inputs, targets)
+validate = load_data_tt(args.validatedata, inputs, targets)
+model = make_model([t.shape for t in train[0]], inputs, [model_bbar], [0, 2], 3, 800, "relu", 0.25, targets, 0.001, 0)
+norm = load_normalization(args.traindata)
+
+model.load_weights(args.model_tt)
 
 targets = feat("top") + feat("atop") +\
           feat("wplus") + feat("wminus") +\

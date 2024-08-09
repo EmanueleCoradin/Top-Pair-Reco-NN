@@ -9,8 +9,9 @@ from tensorflow import keras
 from argparse import ArgumentParser
 from keras.models import model_from_json
 
-from general import table_to_numpy, TitledModel, plot_loss_history, HDF5File, MaxPassLayer, feat, load_normalization
-#custom_objects
+from general import table_to_numpy, TitledModel, plot_loss_history, custom_objects, HDF5File, MaxPassLayer, feat, load_normalization
+from model_bcls import load_data as load_data_b
+from model_bcls import make_model as make_model_b
 
 def load_data(path, inputs, targets):
     with HDF5File(path, "r") as f:
@@ -93,15 +94,37 @@ if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("traindata")
     parser.add_argument("validatedata")
-    parser.add_argument("-bw", "--modelb_weights", default="model_bcls.hdf5")
-    parser.add_argument("-ba", "--modelb_arch", default="model_bcls_architecture.json")
+    parser.add_argument("--output", default='./', help="Output directory")
+    parser.add_argument("-b", "--modelb", default="model_bcls.hdf5")
     args = parser.parse_args()
 
-    with open(args.modelb_arch, 'r') as json_file:
-       model_bcls_json = json_file.read()
-    model_b = model_from_json(model_bcls_json)
-    model_b = keras.models.load_weights(args.modelb_weights)
+    # TODO: find a more elegant way to load the model_b
 
+    #Reconstruct the model_b as has been done in the model_bcls file
+
+    # Provided model construction details
+    features1 = feat("jet") + ["jet_btag"]
+    features2 = feat("alep") + feat("lep") + ["met_pt", "met_phi", "met_x", "met_y"]
+    train    = load_data_b(args.traindata, features1, features2)
+    validate = load_data_b(args.validatedata, features1, features2)
+
+    model_b = make_model_b(
+        [t.shape for t in train[0]],  # Input shapes
+        [features1, features2],       # Input titles
+        [2, 0],                       # Number of layers per input
+        2,                            # Number of layers after concatenation
+        200,                          # Number of nodes per layer
+        "relu",                       # Activation function
+        0.25,                         # Dropout rate
+        train[1].shape[1],            # Number of outputs
+        [],                           # Output titles
+        0.0003,                       # Learning rate
+        0                             # Learning rate decay
+    )
+    
+    model_b.load_weights(args.output + args.modelb)
+
+    # Add the MaxPassLayer and continue growing the tt model
     b_out = MaxPassLayer(2)([model_b.output, model_b.inputs[0]])
     model_bbar = TitledModel(
         model_b.input_titles,
@@ -118,15 +141,15 @@ if __name__ == "__main__":
     validate = load_data(args.validatedata, inputs, targets)
     model_tt = make_model([t.shape for t in train[0]], inputs, [model_bbar], [0, 2], 3, 800, "relu", 0.25, targets, 0.001, 0)
     norm = load_normalization(args.traindata)
-    keras.models.save_model(model_tt, "model_tt.hdf5")
+    keras.models.save_model(model_tt, args.output + "model_tt.hdf5")
     earlystop = keras.callbacks.EarlyStopping(patience=6)
     checkpoint = keras.callbacks.ModelCheckpoint(
-        "model_tt.hdf5", save_best_only=True, verbose=1)
+        args.output + "model_tt.hdf5", save_best_only=True, verbose=1)
 
-    epochs = 500
+    epochs = 250
     batch_size = 2**13
     history = model_tt.fit(
         train[0], train[1], sample_weight=train[2], batch_size=batch_size,
         epochs=epochs, validation_data=validate,
         callbacks=[earlystop, checkpoint])
-    plot_loss_history(history, "loss_tt.svg")
+    plot_loss_history(history, args.output + "loss_tt.svg")

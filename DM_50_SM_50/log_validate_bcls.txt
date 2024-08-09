@@ -1,0 +1,29 @@
+2024-08-09 15:45:41.413286: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 AVX512F FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2024-08-09 15:45:42.386745: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+Traceback (most recent call last):
+  File "/gpfs/dust/cms/user/coradine/Top-Pair-Reco-NN/plot_validation_bcls.py", line 13, in <module>
+    import mplhep as hep
+  File "/home/coradine/.conda/envs/mambaDM/lib/python3.9/site-packages/mplhep/__init__.py", line 6, in <module>
+    import mplhep_data
+ModuleNotFoundError: No module named 'mplhep_data'
+2024-08-09 17:09:22.169915: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2024-08-09 17:09:23.026903: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+Traceback (most recent call last):
+  File "/gpfs/dust/cms/user/coradine/Top-Pair-Reco-NN/plot_validation_bcls.py", line 13, in <module>
+    import mplhep as hep
+  File "/home/coradine/.conda/envs/mambaDM/lib/python3.9/site-packages/mplhep/__init__.py", line 10, in <module>
+    from . import alice, atlas, cms, label, lhcb, plot
+  File "/home/coradine/.conda/envs/mambaDM/lib/python3.9/site-packages/mplhep/alice.py", line 5, in <module>
+    from matplotlib import docstring
+ImportError: cannot import name 'docstring' from 'matplotlib' (/home/coradine/.conda/envs/mambaDM/lib/python3.9/site-packages/matplotlib/__init__.py)
+2024-08-09 17:18:11.985309: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 AVX512F FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2024-08-09 17:18:12.988642: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+2024-08-09 17:18:25.568941: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1635] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 15513 MB memory:  -> device: 0, name: Tesla P100-PCIE-16GB, pci bus id: 0000:86:00.0, compute capability: 6.0
+ 1/27 [>.............................] - ETA: 11s 7/27 [======>.......................] - ETA: 0s 14/27 [==============>...............] - ETA: 0s21/27 [======================>.......] - ETA: 0s27/27 [==============================] - 1s 8ms/step
+/gpfs/dust/cms/user/coradine/Top-Pair-Reco-NN/plot_validation_bcls.py:47: RuntimeWarning: invalid value encountered in divide
+  pred_hist /= hist / 100
+/gpfs/dust/cms/user/coradine/Top-Pair-Reco-NN/plot_validation_bcls.py:49: RuntimeWarning: invalid value encountered in divide
+  mlb_hist /= hist / 100
