@@ -1,0 +1,60 @@
+Traceback (most recent call last):
+  File "/gpfs/dust/cms/user/coradine/Top-Pair-Reco-NN/plot_validation_bcls.py", line 7, in <module>
+    import matplotlib
+ModuleNotFoundError: No module named 'matplotlib'
+2024-08-09 15:01:10.958713: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2024-08-09 15:01:11.817632: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+Traceback (most recent call last):
+  File "/gpfs/dust/cms/user/coradine/Top-Pair-Reco-NN/plot_validation_bcls.py", line 13, in <module>
+    import mplhep as hep
+  File "/home/coradine/.conda/envs/mambaDM/lib/python3.9/site-packages/mplhep/__init__.py", line 6, in <module>
+    import mplhep_data
+ModuleNotFoundError: No module named 'mplhep_data'
+2024-08-09 15:29:46.500443: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2024-08-09 15:29:47.320740: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+Traceback (most recent call last):
+  File "/gpfs/dust/cms/user/coradine/Top-Pair-Reco-NN/plot_validation_bcls.py", line 13, in <module>
+    import mplhep as hep
+  File "/home/coradine/.conda/envs/mambaDM/lib/python3.9/site-packages/mplhep/__init__.py", line 6, in <module>
+    import mplhep_data
+ModuleNotFoundError: No module named 'mplhep_data'
+2024-08-09 16:04:22.447165: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2024-08-09 16:04:23.393533: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+Traceback (most recent call last):
+  File "/gpfs/dust/cms/user/coradine/Top-Pair-Reco-NN/plot_validation_bcls.py", line 13, in <module>
+    import mplhep as hep
+  File "/home/coradine/.conda/envs/mambaDM/lib/python3.9/site-packages/mplhep/__init__.py", line 6, in <module>
+    import mplhep_data
+ModuleNotFoundError: No module named 'mplhep_data'
+2024-08-09 16:38:14.490741: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2024-08-09 16:38:15.162449: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+Traceback (most recent call last):
+  File "/gpfs/dust/cms/user/coradine/Top-Pair-Reco-NN/plot_validation_bcls.py", line 13, in <module>
+    import mplhep as hep
+  File "/home/coradine/.conda/envs/mambaDM/lib/python3.9/site-packages/mplhep/__init__.py", line 6, in <module>
+    import mplhep_data
+ModuleNotFoundError: No module named 'mplhep_data'
+2024-08-09 17:09:06.367841: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2024-08-09 17:09:08.842864: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+Traceback (most recent call last):
+  File "/gpfs/dust/cms/user/coradine/Top-Pair-Reco-NN/plot_validation_bcls.py", line 13, in <module>
+    import mplhep as hep
+  File "/home/coradine/.conda/envs/mambaDM/lib/python3.9/site-packages/mplhep/__init__.py", line 10, in <module>
+    from . import alice, atlas, cms, label, lhcb, plot
+  File "/home/coradine/.conda/envs/mambaDM/lib/python3.9/site-packages/mplhep/alice.py", line 5, in <module>
+    from matplotlib import docstring
+ImportError: cannot import name 'docstring' from 'matplotlib' (/home/coradine/.conda/envs/mambaDM/lib/python3.9/site-packages/matplotlib/__init__.py)
+2024-08-09 17:19:28.680451: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 AVX512F FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2024-08-09 17:19:29.719397: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+2024-08-09 17:19:46.574538: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1635] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 15251 MB memory:  -> device: 0, name: Tesla P100-PCIE-16GB, pci bus id: 0000:86:00.0, compute capability: 6.0
+ 1/27 [>.............................] - ETA: 12s 7/27 [======>.......................] - ETA: 0s 14/27 [==============>...............] - ETA: 0s21/27 [======================>.......] - ETA: 0s27/27 [==============================] - 1s 8ms/step
+/gpfs/dust/cms/user/coradine/Top-Pair-Reco-NN/plot_validation_bcls.py:47: RuntimeWarning: invalid value encountered in divide
+  pred_hist /= hist / 100
+/gpfs/dust/cms/user/coradine/Top-Pair-Reco-NN/plot_validation_bcls.py:49: RuntimeWarning: invalid value encountered in divide
+  mlb_hist /= hist / 100

@@ -88,6 +88,7 @@ if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("traindata")
     parser.add_argument("validatedata")
+    parser.add_argument("--output", default='./', help="Output directory")
     args = parser.parse_args()
 
     features1 = feat("jet") + ["jet_btag"]
@@ -109,12 +110,12 @@ if __name__ == "__main__":
     )
     print(f"Got {train[0][0].shape[0]} events, {train[0][0].shape[1]} jets and {train[1].shape[1]} outputs")
     earlystop = keras.callbacks.EarlyStopping(patience=10, monitor="val_loss", mode="min")
-    checkpoint = keras.callbacks.ModelCheckpoint("model_bcls.hdf5", save_best_only=True, verbose=1)
+    checkpoint = keras.callbacks.ModelCheckpoint(args.output + "model_bcls.hdf5", save_best_only=True, verbose=1)
 
-    epochs = 500
+    epochs = 250
     batch_size = 2**13
     history = model.fit(
         train[0], train[1], sample_weight=train[2], batch_size=batch_size,
         epochs=epochs, validation_data=validate,
         callbacks=[earlystop, checkpoint])
-    plot_loss_history(history, "loss_bcls.svg")
+    plot_loss_history(history, args.output + "loss_bcls.svg")
