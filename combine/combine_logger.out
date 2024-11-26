@@ -1,0 +1,3 @@
+ToyMCSamplerOpt.cc[146] : (in function: generateAsimov) - Using internal logic for binned/unbinned Asimov dataset generation
+ToyMCSamplerOpt.cc[214] : (in function: generateWithHisto) - Generating asimov with histogram for pdf pdf_binsignal_region_obsOnly: in 5 x-bins
+AsymptoticLimits.cc[428] : (in function: runLimitExpected) - Median for expected limits = 3.125, Sigma for expected limits = 1.59442

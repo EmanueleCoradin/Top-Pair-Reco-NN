@@ -1,0 +1,22 @@
+imax    1 number of bins
+jmax    2 number of processes minus 1
+kmax    * number of nuisance parameters
+--------------------------------------------------------------------------------
+shapes data_obs   * combine_dataset.root $CHANNEL/MET_MT2ll_ttbar
+shapes ttbar      * combine_dataset.root $CHANNEL/MET_MT2ll_ttbar $CHANNEL/MET_MT2ll_ttbar_$SYSTEMATIC
+shapes ttZ        * combine_dataset.root $CHANNEL/MET_MT2ll_ttZ $CHANNEL/MET_MT2ll_ttZ_$SYSTEMATIC
+shapes ttDM       * combine_dataset.root $CHANNEL/MET_MT2ll_ttDM_$MASS $CHANNEL/MET_MT2ll_ttDM_$MASS_$SYSTEMATIC
+--------------------------------------------------------------------------------
+bin          signal_region   
+observation  -1          
+--------------------------------------------------------------------------------
+bin                                  signal_region   signal_region   signal_region   
+process                              ttbar           ttZ             ttDM       
+process                              1               2               0               
+rate                                -1              -1              -1        
+--------------------------------------------------------------------------------
+lumi_13TeV                          lnN     1.02            1.02            1.02           
+ttbar_SM                            lnN     1.05               -               -
+ttZ_SM                              lnN        -            1.10               -
+--------------------------------------------------------------------------------
+* autoMCStats 100
